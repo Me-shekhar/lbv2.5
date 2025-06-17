@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for modern teal/cyan theme
+# Custom CSS for modern teal/cyan theme with updated styles
 st.markdown("""
 <style>
     .main-header {
@@ -142,6 +142,14 @@ st.markdown("""
     .css-1d391kg {
         background-color: #0f172a;
     }
+    
+    /* Custom toggle button styling */
+    div.stToggle > label > div[data-testid="stToggleSwitch"] > div {
+        background-color: #475569 !important; /* Inactive state: slate gray */
+    }
+    div.stToggle > label > div[data-testid="stToggleSwitch"] > div[aria-checked="true"] {
+        background-color: #06b6d4 !important; /* Active state: teal */
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -169,9 +177,9 @@ def main():
     
     # Sidebar with menu layout
     with st.sidebar:
-        # Menu header
+        # Menu header with updated gradient
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); 
+        <div style="background: linear-gradient(135deg, #0f766e 0%, #0891b2 100%); 
                     padding: 1rem; border-radius: 10px; text-align: center; margin-bottom: 1rem;">
             <h2 style="color: white; margin: 0;">📋 Menu</h2>
         </div>
@@ -355,21 +363,18 @@ def main():
                 if 'prediction_history' not in st.session_state:
                     st.session_state.prediction_history = []
                 
-                # Create history entry
+                # Create history entry (without timestamp)
                 history_entry = {
                     'hydrocarbon': hydrocarbon,
                     'temperature': temperature,
                     'equiv_ratio': equiv_ratio,
                     'pressure': pressure,
                     'lbv_value': lbv_display,
-                    'unit': unit,
-                    'timestamp': pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+                    'unit': unit
                 }
                 
-                # Add to history (keep last 10 predictions)
+                # Add to history (no limit on predictions)
                 st.session_state.prediction_history.insert(0, history_entry)
-                if len(st.session_state.prediction_history) > 10:
-                    st.session_state.prediction_history = st.session_state.prediction_history[:10]
             else:
                 st.error("Prediction failed. Please check your inputs.")
     
@@ -429,7 +434,7 @@ def main():
             st.markdown("---")
             st.subheader("📜 Prediction History")
             
-            # Create a nice table for history
+            # Create a table for history (without Time column)
             history_data = []
             for i, entry in enumerate(st.session_state.prediction_history):
                 history_data.append({
@@ -438,8 +443,7 @@ def main():
                     "Temp (K)": f"{entry['temperature']:.1f}",
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
-                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
-                    "Time": entry['timestamp'].split()[1][:5]  # Show only HH:MM
+                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}"
                 })
             
             # Display as a styled table
@@ -455,8 +459,7 @@ def main():
                         "Temp (K)": st.column_config.TextColumn("Temp (K)", width="small"),
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
-                        "LBV": st.column_config.TextColumn("LBV", width="medium"),
-                        "Time": st.column_config.TextColumn("Time", width="small")
+                        "LBV": st.column_config.TextColumn("LBV", width="medium")
                     }
                 )
                 
@@ -465,30 +468,13 @@ def main():
                     st.session_state.prediction_history = []
                     st.rerun()
     
-    else:
-        # Placeholder when no prediction made
-        st.markdown("""
-        <div class="input-container">
-            <h3>🎯 Prediction Results</h3>
-            <p>Enter your parameters and click "Predict LBV" to see the results.</p>
-            <br>
-            <h4>📈 How it works:</h4>
-            <ul>
-                <li>Select your hydrocarbon fuel type</li>
-                <li>Set the initial temperature (300-750 K)</li>
-                <li>Choose the equivalence ratio (0.1-2.4)</li>
-                <li>Set the pressure (1-10 atm)</li>
-                <li>Get instant LBV prediction!</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Show history even when no current prediction if toggle is on
+    # Show history even when no current prediction if toggle is on
+    if not st.session_state.get('prediction_made', False):
         if st.session_state.get('show_history', True) and 'prediction_history' in st.session_state and len(st.session_state.prediction_history) > 0:
             st.markdown("---")
             st.subheader("📜 Previous Predictions")
             
-            # Create a nice table for history
+            # Create a table for history (without Time column)
             history_data = []
             for i, entry in enumerate(st.session_state.prediction_history):
                 history_data.append({
@@ -497,8 +483,7 @@ def main():
                     "Temp (K)": f"{entry['temperature']:.1f}",
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
-                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
-                    "Time": entry['timestamp'].split()[1][:5]  # Show only HH:MM
+                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}"
                 })
             
             # Display as a styled table
@@ -514,8 +499,7 @@ def main():
                         "Temp (K)": st.column_config.TextColumn("Temp (K)", width="small"),
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
-                        "LBV": st.column_config.TextColumn("LBV", width="medium"),
-                        "Time": st.column_config.TextColumn("Time", width="small")
+                        "LBV": st.column_config.TextColumn("LBV", width="medium")
                     }
                 )
                 
