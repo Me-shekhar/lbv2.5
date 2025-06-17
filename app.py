@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for modern teal/cyan theme with updated styles
+# Custom CSS for modern teal/cyan theme
 st.markdown("""
 <style>
     .main-header {
@@ -133,7 +133,17 @@ st.markdown("""
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     }
     
-    /* Hide captions initially */
+    
+    /* Toggle switch custom styling */
+    .stToggle > label > div:first-child {
+        background-color: #0f766e !important;
+        border-color: #0f766e !important;
+    }
+    .stToggle > label > div:first-child:hover {
+        background-color: #0d9488 !important;
+    }
+
+/* Hide captions initially */
     .caption-hidden {
         display: none;
     }
@@ -141,14 +151,6 @@ st.markdown("""
     /* Sidebar styling */
     .css-1d391kg {
         background-color: #0f172a;
-    }
-    
-    /* Custom toggle button styling */
-    div.stToggle > label > div[data-testid="stToggleSwitch"] > div {
-        background-color: #475569 !important; /* Inactive state: slate gray */
-    }
-    div.stToggle > label > div[data-testid="stToggleSwitch"] > div[aria-checked="true"] {
-        background-color: #06b6d4 !important; /* Active state: teal */
     }
 </style>
 """, unsafe_allow_html=True)
@@ -177,7 +179,7 @@ def main():
     
     # Sidebar with menu layout
     with st.sidebar:
-        # Menu header with updated gradient
+        # Menu header
         st.markdown("""
         <div style="background: linear-gradient(135deg, #0f766e 0%, #0891b2 100%); 
                     padding: 1rem; border-radius: 10px; text-align: center; margin-bottom: 1rem;">
@@ -255,8 +257,7 @@ def main():
             st.write("• 30 more research papers on laminar burning velocity measurements")
     
     # Main content - single column layout
-    st.markdown('<div class="input-container">', unsafe_allow_html=True)
-    st.subheader("🔧 Input Parameters")
+        st.subheader("🔧 Input Parameters")
     
     # First row - Hydrocarbon selection (full width)
     hydrocarbon = st.selectbox(
@@ -324,8 +325,7 @@ def main():
         # Predict button
         predict_clicked = st.button("🔥 Predict LBV", type="primary")
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    
+        
     # Handle prediction
     if predict_clicked:
         # Validate inputs
@@ -363,17 +363,18 @@ def main():
                 if 'prediction_history' not in st.session_state:
                     st.session_state.prediction_history = []
                 
-                # Create history entry (without timestamp)
+                # Create history entry
                 history_entry = {
                     'hydrocarbon': hydrocarbon,
                     'temperature': temperature,
                     'equiv_ratio': equiv_ratio,
                     'pressure': pressure,
                     'lbv_value': lbv_display,
-                    'unit': unit
+                    'unit': unit,
+                    'timestamp': pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
                 
-                # Add to history (no limit on predictions)
+                # Add to history (no limit)
                 st.session_state.prediction_history.insert(0, history_entry)
             else:
                 st.error("Prediction failed. Please check your inputs.")
@@ -434,7 +435,7 @@ def main():
             st.markdown("---")
             st.subheader("📜 Prediction History")
             
-            # Create a table for history (without Time column)
+            # Create a nice table for history
             history_data = []
             for i, entry in enumerate(st.session_state.prediction_history):
                 history_data.append({
@@ -443,7 +444,8 @@ def main():
                     "Temp (K)": f"{entry['temperature']:.1f}",
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
-                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}"
+                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
+                    : entry['timestamp'].split()[1][:5]  # Show only HH:MM
                 })
             
             # Display as a styled table
@@ -459,8 +461,8 @@ def main():
                         "Temp (K)": st.column_config.TextColumn("Temp (K)", width="small"),
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
-                        "LBV": st.column_config.TextColumn("LBV", width="medium")
-                    }
+                        "LBV": st.column_config.TextColumn("LBV", width="medium"),
+                                            }
                 )
                 
                 # Clear history button
@@ -468,13 +470,30 @@ def main():
                     st.session_state.prediction_history = []
                     st.rerun()
     
-    # Show history even when no current prediction if toggle is on
-    if not st.session_state.get('prediction_made', False):
+    else:
+        # Placeholder when no prediction made
+        st.markdown("""
+        <div class="input-container">
+            <h3>🎯 Prediction Results</h3>
+            <p>Enter your parameters and click "Predict LBV" to see the results.</p>
+            <br>
+            <h4>📈 How it works:</h4>
+            <ul>
+                <li>Select your hydrocarbon fuel type</li>
+                <li>Set the initial temperature (300-750 K)</li>
+                <li>Choose the equivalence ratio (0.1-2.4)</li>
+                <li>Set the pressure (1-10 atm)</li>
+                <li>Get instant LBV prediction!</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Show history even when no current prediction if toggle is on
         if st.session_state.get('show_history', True) and 'prediction_history' in st.session_state and len(st.session_state.prediction_history) > 0:
             st.markdown("---")
             st.subheader("📜 Previous Predictions")
             
-            # Create a table for history (without Time column)
+            # Create a nice table for history
             history_data = []
             for i, entry in enumerate(st.session_state.prediction_history):
                 history_data.append({
@@ -483,7 +502,8 @@ def main():
                     "Temp (K)": f"{entry['temperature']:.1f}",
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
-                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}"
+                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
+                    : entry['timestamp'].split()[1][:5]  # Show only HH:MM
                 })
             
             # Display as a styled table
@@ -499,8 +519,8 @@ def main():
                         "Temp (K)": st.column_config.TextColumn("Temp (K)", width="small"),
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
-                        "LBV": st.column_config.TextColumn("LBV", width="medium")
-                    }
+                        "LBV": st.column_config.TextColumn("LBV", width="medium"),
+                                            }
                 )
                 
                 # Clear history button
