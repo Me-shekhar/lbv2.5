@@ -142,6 +142,25 @@ st.markdown("""
     .css-1d391kg {
         background-color: #0f172a;
     }
+    
+    /* Custom styling for toggle buttons */
+    .stToggle > label {
+        color: white;
+    }
+    .stToggle > label > span {
+        background-color: #1e293b;
+        border: 2px solid #0f766e;
+        border-radius: 12px;
+    }
+    .stToggle [type="checkbox"]:checked + span {
+        background-color: #0f766e;
+    }
+    .stToggle [type="checkbox"]:checked + span:hover {
+        background-color: #0891b2;
+    }
+    .stToggle [type="checkbox"]:focus + span {
+        box-shadow: 0 0 0 2px #0891b2;
+    }
 </style>
 """, unsafe_allow_html=True)
 
