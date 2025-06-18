@@ -169,9 +169,9 @@ def main():
     
     # Sidebar with menu layout
     with st.sidebar:
-        # Menu header
+        # Menu header with updated gradient
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); 
+        <div style="background: linear-gradient(135deg, #0f766e 0%, #0891b2 100%); 
                     padding: 1rem; border-radius: 10px; text-align: center; margin-bottom: 1rem;">
             <h2 style="color: white; margin: 0;">📋 Menu</h2>
         </div>
