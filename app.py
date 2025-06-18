@@ -355,21 +355,18 @@ def main():
                 if 'prediction_history' not in st.session_state:
                     st.session_state.prediction_history = []
                 
-                # Create history entry
+                # Create history entry (without timestamp)
                 history_entry = {
                     'hydrocarbon': hydrocarbon,
                     'temperature': temperature,
                     'equiv_ratio': equiv_ratio,
                     'pressure': pressure,
                     'lbv_value': lbv_display,
-                    'unit': unit,
-                    'timestamp': pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+                    'unit': unit
                 }
                 
-                # Add to history (keep last 10 predictions)
+                # Add to history (no limit on predictions)
                 st.session_state.prediction_history.insert(0, history_entry)
-                if len(st.session_state.prediction_history) > 10:
-                    st.session_state.prediction_history = st.session_state.prediction_history[:10]
             else:
                 st.error("Prediction failed. Please check your inputs.")
     
@@ -429,7 +426,7 @@ def main():
             st.markdown("---")
             st.subheader("📜 Prediction History")
             
-            # Create a nice table for history
+            # Create a table for history (without Time column)
             history_data = []
             for i, entry in enumerate(st.session_state.prediction_history):
                 history_data.append({
@@ -438,8 +435,7 @@ def main():
                     "Temp (K)": f"{entry['temperature']:.1f}",
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
-                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
-                    "Time": entry['timestamp'].split()[1][:5]  # Show only HH:MM
+                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}"
                 })
             
             # Display as a styled table
@@ -455,8 +451,7 @@ def main():
                         "Temp (K)": st.column_config.TextColumn("Temp (K)", width="small"),
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
-                        "LBV": st.column_config.TextColumn("LBV", width="medium"),
-                        "Time": st.column_config.TextColumn("Time", width="small")
+                        "LBV": st.column_config.TextColumn("LBV", width="medium")
                     }
                 )
                 
@@ -488,7 +483,7 @@ def main():
             st.markdown("---")
             st.subheader("📜 Previous Predictions")
             
-            # Create a nice table for history
+            # Create a table for history (without Time column)
             history_data = []
             for i, entry in enumerate(st.session_state.prediction_history):
                 history_data.append({
@@ -497,8 +492,7 @@ def main():
                     "Temp (K)": f"{entry['temperature']:.1f}",
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
-                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
-                    "Time": entry['timestamp'].split()[1][:5]  # Show only HH:MM
+                    "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}"
                 })
             
             # Display as a styled table
@@ -514,8 +508,7 @@ def main():
                         "Temp (K)": st.column_config.TextColumn("Temp (K)", width="small"),
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
-                        "LBV": st.column_config.TextColumn("LBV", width="medium"),
-                        "Time": st.column_config.TextColumn("Time", width="small")
+                        "LBV": st.column_config.TextColumn("LBV", width="medium")
                     }
                 )
                 
