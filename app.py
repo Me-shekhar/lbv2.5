@@ -133,17 +133,7 @@ st.markdown("""
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     }
     
-    
-    /* Toggle switch custom styling */
-    .stToggle > label > div:first-child {
-        background-color: #0f766e !important;
-        border-color: #0f766e !important;
-    }
-    .stToggle > label > div:first-child:hover {
-        background-color: #0d9488 !important;
-    }
-
-/* Hide captions initially */
+    /* Hide captions initially */
     .caption-hidden {
         display: none;
     }
@@ -181,7 +171,7 @@ def main():
     with st.sidebar:
         # Menu header
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #0f766e 0%, #0891b2 100%); 
+        <div style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); 
                     padding: 1rem; border-radius: 10px; text-align: center; margin-bottom: 1rem;">
             <h2 style="color: white; margin: 0;">📋 Menu</h2>
         </div>
@@ -257,7 +247,8 @@ def main():
             st.write("• 30 more research papers on laminar burning velocity measurements")
     
     # Main content - single column layout
-        st.subheader("🔧 Input Parameters")
+    st.markdown('<div class="input-container">', unsafe_allow_html=True)
+    st.subheader("🔧 Input Parameters")
     
     # First row - Hydrocarbon selection (full width)
     hydrocarbon = st.selectbox(
@@ -325,7 +316,8 @@ def main():
         # Predict button
         predict_clicked = st.button("🔥 Predict LBV", type="primary")
     
-        
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     # Handle prediction
     if predict_clicked:
         # Validate inputs
@@ -374,8 +366,10 @@ def main():
                     'timestamp': pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
                 
-                # Add to history (no limit)
+                # Add to history (keep last 10 predictions)
                 st.session_state.prediction_history.insert(0, history_entry)
+                if len(st.session_state.prediction_history) > 10:
+                    st.session_state.prediction_history = st.session_state.prediction_history[:10]
             else:
                 st.error("Prediction failed. Please check your inputs.")
     
@@ -445,7 +439,7 @@ def main():
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
                     "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
-                    : entry['timestamp'].split()[1][:5]  # Show only HH:MM
+                    "Time": entry['timestamp'].split()[1][:5]  # Show only HH:MM
                 })
             
             # Display as a styled table
@@ -462,7 +456,8 @@ def main():
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
                         "LBV": st.column_config.TextColumn("LBV", width="medium"),
-                                            }
+                        "Time": st.column_config.TextColumn("Time", width="small")
+                    }
                 )
                 
                 # Clear history button
@@ -503,7 +498,7 @@ def main():
                     "φ": f"{entry['equiv_ratio']:.2f}",
                     "P (atm)": f"{entry['pressure']:.1f}",
                     "LBV": f"{entry['lbv_value']:.2f} {entry['unit']}",
-                    : entry['timestamp'].split()[1][:5]  # Show only HH:MM
+                    "Time": entry['timestamp'].split()[1][:5]  # Show only HH:MM
                 })
             
             # Display as a styled table
@@ -520,7 +515,8 @@ def main():
                         "φ": st.column_config.TextColumn("φ", width="small"),
                         "P (atm)": st.column_config.TextColumn("P (atm)", width="small"),
                         "LBV": st.column_config.TextColumn("LBV", width="medium"),
-                                            }
+                        "Time": st.column_config.TextColumn("Time", width="small")
+                    }
                 )
                 
                 # Clear history button
@@ -530,3 +526,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
